@@ -1,27 +1,30 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity ^0.8.20;
 
 import {Script} from "forge-std/Script.sol";
 import {LiquidityPool} from "../src/LiquidityPool.sol";
+import {SwapCrossChain} from "../src/SwapCrossChain.sol";
+import {Inter} from "../src/Inter.sol";
 
-contract DeployLiquidityPool is Script {
-    address deployer;
-    LiquidityPool internal liquidityPool;
+contract DeployContracts is Script {
+    address public constant TOKEN0 = 0x4200000000000000000000000000000000000024; // Example Token 0
+    address public constant TOKEN1 = 0x4200000000000000000000000000000000000034; // Example Token 1
 
-    uint256 public DEFAULT_ANVIL_PRIVATE_KEY = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
-    address public constant TOKEN0 = 0x4200000000000000000000000000000000000024; // Example Superchain Token
-    address public constant TOKEN1 = 0x4200000000000000000000000000000000000034; // Example Superchain Token
+    function run() external {
+        vm.startBroadcast({chainId: 1});
 
-    function run() external returns (LiquidityPool) {
-        vm.startBroadcast(DEFAULT_ANVIL_PRIVATE_KEY);
+        // Deploy on Chain 2
+        LiquidityPool liquidityPool = new LiquidityPool(TOKEN0, TOKEN1);
+        Inter interContract = new Inter();
 
-        deployer = vm.addr(DEFAULT_ANVIL_PRIVATE_KEY);
+        vm.startBroadcast({chainId: 2});
+        // Deploy on Chain 1
+        SwapCrossChain swapCrossChain = new SwapCrossChain();
 
-        // Deploy the liquidity pool
-        liquidityPool = new LiquidityPool(TOKEN0, TOKEN1);
+        console.log("LiquidityPool deployed at:", address(liquidityPool));
+        console.log("Inter deployed at:", address(interContract));
+        console.log("SwapCrossChain deployed at:", address(swapCrossChain));
 
         vm.stopBroadcast();
-
-        return liquidityPool;
     }
 }

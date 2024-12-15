@@ -28,7 +28,7 @@ contract SimpleLiquidityPool is SuperchainERC20 {
     }
 
     // Add liquidity
-    function addLiquidity(uint256 amount0, uint256 amount1) external returns (uint256 liquidity) {
+    function addLiquidity(uint256 amount0, uint256 amount1, address user) external returns (uint256 liquidity) {
         SuperchainERC20(token0).transferFrom(msg.sender, address(this), amount0);
         SuperchainERC20(token1).transferFrom(msg.sender, address(this), amount1);
 
@@ -39,13 +39,13 @@ contract SimpleLiquidityPool is SuperchainERC20 {
         }
 
         require(liquidity > 0, "Insufficient liquidity minted");
-        balanceOf[msg.sender] += liquidity;
+        balanceOf[user] += liquidity;
         totalSupply += liquidity;
 
         reserve0 += amount0;
         reserve1 += amount1;
 
-        emit Mint(msg.sender, amount0, amount1);
+        emit Mint(user, amount0, amount1);
         emit Sync(reserve0, reserve1);
     }
 
