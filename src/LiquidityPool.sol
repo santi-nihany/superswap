@@ -29,8 +29,8 @@ contract SimpleLiquidityPool is SuperchainERC20 {
 
     // Add liquidity
     function addLiquidity(uint256 amount0, uint256 amount1) external returns (uint256 liquidity) {
-        ERC20(token0).transferFrom(msg.sender, address(this), amount0);
-        ERC20(token1).transferFrom(msg.sender, address(this), amount1);
+        SuperchainERC20(token0).transferFrom(msg.sender, address(this), amount0);
+        SuperchainERC20(token1).transferFrom(msg.sender, address(this), amount1);
 
         if (totalSupply == 0) {
             liquidity = Math.sqrt(amount0 * amount1);
@@ -64,8 +64,8 @@ contract SimpleLiquidityPool is SuperchainERC20 {
         reserve0 -= amount0;
         reserve1 -= amount1;
 
-        ERC20(token0).transfer(msg.sender, amount0);
-        ERC20(token1).transfer(msg.sender, amount1);
+        SuperchainERC20(token0).transfer(msg.sender, amount0);
+        SuperchainERC20(token1).transfer(msg.sender, amount1);
 
         emit Burn(msg.sender, amount0, amount1, msg.sender);
         emit Sync(reserve0, reserve1);
@@ -76,11 +76,11 @@ contract SimpleLiquidityPool is SuperchainERC20 {
         require(amount0Out > 0 || amount1Out > 0, "Insufficient output amount");
         require(amount0Out < reserve0 && amount1Out < reserve1, "Insufficient liquidity");
 
-        uint256 balance0 = ERC20(token0).balanceOf(address(this));
-        uint256 balance1 = ERC20(token1).balanceOf(address(this));
+        uint256 balance0 = SuperchainERC20(token0).balanceOf(address(this));
+        uint256 balance1 = SuperchainERC20(token1).balanceOf(address(this));
 
-        if (amount0Out > 0) ERC20(token0).transfer(msg.sender, amount0Out);
-        if (amount1Out > 0) ERC20(token1).transfer(msg.sender, amount1Out);
+        if (amount0Out > 0) SuperchainERC20(token0).transfer(msg.sender, amount0Out);
+        if (amount1Out > 0) SuperchainERC20(token1).transfer(msg.sender, amount1Out);
 
         uint256 amount0In = balance0 > reserve0 - amount0Out ? balance0 - (reserve0 - amount0Out) : 0;
         uint256 amount1In = balance1 > reserve1 - amount1Out ? balance1 - (reserve1 - amount1Out) : 0;
